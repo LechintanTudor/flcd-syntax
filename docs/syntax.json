@@ -1,0 +1,116 @@
+{
+    "terminals": [
+        "identifier",
+        "constant",
+        "~",
+        ";",
+         "",
+        "\n",
+        "{",
+        "}",
+        "(",
+        ")",
+        "[",
+        "]",
+        "<",
+        "<=",
+        ">",
+        ">=",
+        "=",
+        "<-",
+        "+",
+        "-",
+        "*",
+        "/",
+        "%",
+        ":",
+        "var",
+        "integer",
+        "boolean",
+        "char",
+        "false",
+        "true",
+        "while",
+        "read",
+        "print",
+        "if",
+        "else"
+    ],
+    "nonterminals": {
+    	"comparison_operator": [
+            ["<"],
+            ["<="],
+            [">"],
+            [">="],
+            ["<>"]
+    	],
+    	"arithmetic_operator": [
+            ["+"],
+            ["-"],
+            ["*"],
+            ["/"]
+    	],
+    	"binary_operator": [
+            ["comparison_operator"],
+            ["arithmetic_operator"]
+    	],
+    	"factor": [
+            ["identifier"],
+            ["constant"]
+    	],
+    	"expression": [
+            ["factor"],
+            ["expression", "binary_operator", "expression"],
+            ["(", "expression", ")"]
+    	],
+    	"primitive_type": [
+    		["boolean"],
+    		["char"],
+    		["integer"]
+    	],
+    	"array_type": [
+    		["primitive_type", "[", "]"],
+    		["array_type", "[", "]"]
+    	],
+    	"type": [
+    		["primitive_type"],
+    		["array_type"]
+    	],
+    	"simple_declaration": [
+    		["var", "identifier", ":", "type"]
+    	],
+    	"declaration": [
+    		[""],
+    		["simple_declaration", ";"],
+    		["simple_declaration", ";", "declaration"]
+    	],
+    	"assignment_statement": [
+            ["identifier", "<-", "expression"]
+    	],
+    	"io_statement": [
+            ["read", "(", "identifier", ")"],
+            ["print", "(", "expression", ")"]
+    	],
+    	"if_statement": [
+            ["if", "(", "expression", ")", "{", "statement", "}", "else", "{", "statement", "}"]
+    	],
+    	"while_statement": [
+            ["while", "(", "expression", ")", "{", "statement", "}"]
+    	],
+    	"simple_statement": [
+            ["assignment_statement"],
+            ["io_statement"],
+            ["if_statement"],
+            ["while_statement"]
+    	],
+    	"statement": [
+    		[],
+    		["simple_statement", ";"],
+    		["simple_statement", ";", "statement"]
+    	],
+    	"program": [
+    		["~", "declaration", "statement", "~"]
+    	]
+    }
+}
+
