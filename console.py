@@ -20,17 +20,21 @@ class Console:
             print(e)
 
     def handle_terminals(self):
-        print(self.grammar.get_terminals())
+        for term in self.grammar.get_terminals():
+            print(term)
 
     def handle_nonterminals(self):
-        print(self.grammar.get_non_terminals())
+        for nonterm in self.grammar.get_non_terminals():
+            print(nonterm)
 
     def handle_productions(self):
         non_terminal = input('Enter non_terminal or press enter if you want to see all productions\n').strip()
         if len(non_terminal) == 0:
-            print(self.grammar.get_productions())
+            for prod in self.grammar.get_productions():
+                print(prod)
         else:
-            print(self.grammar.get_productions(non_terminal=non_terminal))
+            for prod in self.grammar.get_productions(non_terminal=non_terminal):
+                print(prod)
 
     def run(self):
         while True:
@@ -42,6 +46,7 @@ class Console:
                 print('Invalid command')
                 continue
             self.cmds[cmd]()
+            print()
 
     def print_menu(self):
         print('Commands:\n'
