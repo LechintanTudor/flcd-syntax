@@ -37,8 +37,8 @@ class Parser:
 
 
 g = Grammar()
-g.load_from_file('docs/simple.json')
+g.load_from_file("docs/simple.json")
 ag = AugmentedGrammar(g)
 ag.get_productions()
-p = Parser(g, 'S')
+p = Parser(g, "S")
 p.create_closures()
