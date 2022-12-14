@@ -10,7 +10,7 @@ class Parser:
         self.program = program
         self.aug_grammar = AugmentedGrammar(self.grammar, program)
 
-    def get_non_term_after_dot(self, production):
+    def get_symbol_after_dot(self, production):
         element_iter = iter(production[1])
         found_dot = False
 
@@ -22,7 +22,7 @@ class Parser:
                     if isinstance(element, Dot):
                         found_dot = True
                 else:
-                    if element in self.grammar.get_non_terminals():
+                    if element in self.grammar.get_non_terminals()+self.grammar.get_terminals():
                         return element
                     else:
                         return None
@@ -34,7 +34,7 @@ class Parser:
         while True:
             new_entry = False
             for production in result:
-                el_after_dot = self.get_non_term_after_dot(production)
+                el_after_dot = self.get_symbol_after_dot(production)
                 if el_after_dot in self.aug_grammar.get_non_terminals():
                     possible_productions = self.aug_grammar.get_productions(non_terminal=el_after_dot)
                     for possible_production in possible_productions:
@@ -57,7 +57,7 @@ class Parser:
     def goto(self, item_set, symbol):
         result = []
         for item in item_set:
-            el_after_dot = self.get_non_term_after_dot(item)
+            el_after_dot = self.get_symbol_after_dot(item)
             if el_after_dot != symbol:
                 continue
             dot_index = self.dot_index(item)
@@ -71,12 +71,17 @@ class Parser:
         return result
 
     def colcan(self):
-        can = [self.closure(self.aug_grammar.get_productions(self.aug_grammar.root_non_terminal))]
+        can = self.closure(
+                [
+                    (self.aug_grammar.root_non_terminal, prod)
+                    for prod in self.aug_grammar.get_productions(self.aug_grammar.root_non_terminal)
+                    ]
+            )
         while True:
             new_entry = False
             for s in can:
-                for symbol in self.aug_grammar.non_terminals + self.aug_grammar.non_terminals:
-                    new_states = self.goto(s, symbol)
+                for symbol in self.aug_grammar.get_non_terminals() + self.aug_grammar.get_terminals():
+                    new_states = self.goto([s], symbol)
                     if len(new_states) > 0:
                         for new_state in new_states:
                             if new_state not in can:
@@ -168,4 +173,5 @@ p = Parser(g, "S")
 closure = p.closure([("S'", [Dot(), "S"])])
 goto = p.goto([("S'", [Dot(), "S"])], 'S')
 
-print(p.colcan())
+for s in p.colcan():
+    print(s)
