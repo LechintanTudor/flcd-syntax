@@ -76,4 +76,3 @@ class AugmentedGrammar(Grammar):
     @property
     def root_non_terminal(self):
         return self._root_non_terminal
-

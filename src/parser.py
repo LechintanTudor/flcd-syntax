@@ -22,7 +22,11 @@ class Parser:
                     if isinstance(element, Dot):
                         found_dot = True
                 else:
-                    if element in self.grammar.get_non_terminals()+self.grammar.get_terminals():
+                    if (
+                        element
+                        in self.grammar.get_non_terminals()
+                        + self.grammar.get_terminals()
+                    ):
                         return element
                     else:
                         return None
@@ -36,7 +40,9 @@ class Parser:
             for production in result:
                 el_after_dot = self.get_symbol_after_dot(production)
                 if el_after_dot in self.aug_grammar.get_non_terminals():
-                    possible_productions = self.aug_grammar.get_productions(non_terminal=el_after_dot)
+                    possible_productions = self.aug_grammar.get_productions(
+                        non_terminal=el_after_dot
+                    )
                     for possible_production in possible_productions:
                         if (el_after_dot, possible_production) not in result:
                             result.append((el_after_dot, possible_production))
@@ -65,22 +71,27 @@ class Parser:
                 item[0],
                 item[1][:dot_index]
                 + [item[1][dot_index + 1], Dot()]
-                + item[1][(dot_index + 2):]
+                + item[1][(dot_index + 2) :],
             )
             result += self.closure([swapped_production])
         return result
 
     def colcan(self):
         can = self.closure(
-                [
-                    (self.aug_grammar.root_non_terminal, prod)
-                    for prod in self.aug_grammar.get_productions(self.aug_grammar.root_non_terminal)
-                    ]
-            )
+            [
+                (self.aug_grammar.root_non_terminal, prod)
+                for prod in self.aug_grammar.get_productions(
+                    self.aug_grammar.root_non_terminal
+                )
+            ]
+        )
         while True:
             new_entry = False
             for s in can:
-                for symbol in self.aug_grammar.get_non_terminals() + self.aug_grammar.get_terminals():
+                for symbol in (
+                    self.aug_grammar.get_non_terminals()
+                    + self.aug_grammar.get_terminals()
+                ):
                     new_states = self.goto([s], symbol)
                     if len(new_states) > 0:
                         for new_state in new_states:
@@ -124,9 +135,9 @@ class Parser:
 
                     # Generate a production where the dot and the next item are swapped
                     swapped_production = (
-                            dst[:dot_index]
-                            + [dst[next_index], Dot()]
-                            + dst[(dot_index + 2):]
+                        dst[:dot_index]
+                        + [dst[next_index], Dot()]
+                        + dst[(dot_index + 2) :]
                     )
 
                     # Skip the iteration if the production already exists
@@ -146,14 +157,16 @@ class Parser:
                     # If the item right after the dot is a nonterminal, add its productions to the
                     # state
                     if (
-                            non_terminal_index < len(swapped_production)
-                            and swapped_production[non_terminal_index]
-                            in self.aug_grammar.non_terminals
+                        non_terminal_index < len(swapped_production)
+                        and swapped_production[non_terminal_index]
+                        in self.aug_grammar.non_terminals
                     ):
                         non_terminal = swapped_production[non_terminal_index]
                         state[non_terminal] = []
 
-                        for dst in self.aug_grammar.get_productions(non_terminal=non_terminal):
+                        for dst in self.aug_grammar.get_productions(
+                            non_terminal=non_terminal
+                        ):
                             if dst != swapped_production:
                                 state[non_terminal].append(dst)
 
@@ -165,13 +178,14 @@ class Parser:
         return states
 
 
-g = Grammar()
-g.load_from_file("/Users/cipri/PycharmProjects/flcd-syntax/docs/simple.json")
-ag = AugmentedGrammar(g, "S")
-ag.get_productions()
-p = Parser(g, "S")
-closure = p.closure([("S'", [Dot(), "S"])])
-goto = p.goto([("S'", [Dot(), "S"])], 'S')
+# g = Grammar()
+# g.load_from_file("docs/simple.json")
+# ag = AugmentedGrammar(g, "S")
+# ag.get_productions()
+# p = Parser(g, "S")
+# closure = p.closure([("S'", [Dot(), "S"])])
+# goto = p.goto([("S'", [Dot(), "S"])], 'S')
 
-for s in p.colcan():
-    print(s)
+# for s in p.colcan():
+#     print(s)
+#     print()
