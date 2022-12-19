@@ -1,7 +1,6 @@
 from augmented_grammar import AugmentedGrammar
 from dataclasses import dataclass
 from dot import Dot
-from functools import reduce
 from item import Item
 import json
 from parser_types import Nonterminal, Terminal, Symbol
@@ -33,7 +32,7 @@ class Grammar:
         )
 
     def __str__(self) -> str:
-        production_str = reduce(lambda p1, p2: f"{p1}\n{p2}", self.productions)
+        production_str = "\n".join(self.productions)
 
         return (
             f"Nonterminals: {self.nonterminals}\n\n"
