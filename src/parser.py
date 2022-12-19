@@ -4,6 +4,7 @@ from state import State
 from item import Item
 from typing import Optional
 from parser_types import ItemSymbol, Symbol
+from canonical_collection import CanonicalCollection
 
 
 def get_symbol_after_dot(item: Item) -> Optional[ItemSymbol]:
@@ -73,3 +74,6 @@ class Parser:
             return self.closure(shifted_item)
 
         return None
+
+    def canonical_collection(self) -> Cann:
+        raise NotImplementedError()
