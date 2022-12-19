@@ -1,10 +1,5 @@
-from console import Console
-
-
-def main():
-    c = Console()
-    c.run()
-
+from grammar import Grammar
 
 if __name__ == "__main__":
-    main()
+    grammar = Grammar.load_from_json("docs/simple.json")
+    print(grammar)

@@ -1,78 +1,43 @@
-from copy import deepcopy
+from dataclasses import dataclass
+from functools import reduce
 import json
+from parser_types import Nonterminal, Terminal, Symbol
+from production import Production
 
 
-class Dot:
-    def __str__(self):
-        return "<DOT/>"
-
-    def __repr__(self):
-        return "<DOT/>"
-
-    def __eq__(self, other):
-        return isinstance(other, Dot)
-
-
+@dataclass
 class Grammar:
-    def __init__(self):
-        self._non_terminals = []
-        self._terminals = []
-        self._productions = {}
+    nonterminals: set[Nonterminal]
+    terminals: set[Terminal]
+    productions: list[Production]
+    start_nonterminal: Nonterminal
 
-    def load_from_file(self, filename):
-        with open(filename, "rt") as f:
-            json_data = json.load(f)
-            self._terminals = json_data["terminals"]
-            self._non_terminals = list(json_data["nonterminals"].keys())
+    def __str__(self) -> str:
+        production_str = reduce(lambda p1, p2: f"{p1}\n{p2}", self.productions)
 
-            for non_terminal in self._non_terminals:
-                if non_terminal not in self._productions:
-                    self._productions[non_terminal] = []
+        return (
+            f"Nonterminals: {self.nonterminals}\n"
+            f"Terminals: {self.terminals}\n"
+            f"Productions: {production_str}\n"
+            f"Start nonterminal: {self.start_nonterminal}"
+        )
 
-                self._productions[non_terminal] = json_data["nonterminals"][
-                    non_terminal
-                ]
+    @staticmethod
+    def load_from_json(path: str) -> "Grammar":
+        with open(path, "rt") as file:
+            json_data = json.load(file)
+            nonterminals = set(json_data["nonterminals"].keys())
+            terminals = set(json_data["terminals"])
 
-    def get_terminals(self):
-        return self._terminals
+            productions = []
+            for lhp, rhp_list in json_data["nonterminals"].items():
+                for rhp in rhp_list:
+                    productions.append(Production(lhp, rhp))
+            productions.sort(key=lambda production: production.lhp)
 
-    def get_non_terminals(self):
-        return self._non_terminals
+            start_nonterminal = json_data["start_nonterminal"]
 
-    def get_productions(self, non_terminal=None):
-        if non_terminal:
-            return self._productions[non_terminal]
+            if start_nonterminal not in nonterminals:
+                raise ValueError("Start nonterminal not found in nonterminals")
 
-        return self._productions
-
-
-class AugmentedGrammar(Grammar):
-    def __init__(self, grammar: Grammar, start_non_terminal: str):
-        super().__init__()
-
-        assert start_non_terminal in grammar.get_non_terminals()
-        root_non_terminal = f"{start_non_terminal}'"
-
-        self._terminals = grammar.get_terminals()
-        self._non_terminals = grammar.get_non_terminals() + [root_non_terminal]
-        self._productions = {root_non_terminal: [[Dot(), start_non_terminal]]}
-        self._root_non_terminal = root_non_terminal
-
-        for non_terminal in self._non_terminals:
-            if non_terminal in grammar.get_productions():
-                self._productions[non_terminal] = []
-
-                for prod in grammar.get_productions()[non_terminal]:
-                    self._productions[non_terminal].append([Dot()] + prod)
-
-    @property
-    def productions(self):
-        return self._productions
-
-    @property
-    def non_terminals(self):
-        return self._non_terminals
-
-    @property
-    def root_non_terminal(self):
-        return self._root_non_terminal
+            return Grammar(nonterminals, terminals, productions, start_nonterminal)

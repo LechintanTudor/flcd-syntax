@@ -8,5 +8,6 @@
       ["a", "A"],
       ["b"]
     ]
-  }
+  },
+  "start_nonterminal": "A"
 }
