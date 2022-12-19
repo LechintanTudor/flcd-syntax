@@ -3,7 +3,7 @@ from dot import Dot
 from state import State
 from item import Item
 from typing import Optional
-from parser_types import ItemSymbol
+from parser_types import ItemSymbol, Symbol
 
 
 def get_symbol_after_dot(item: Item) -> Optional[ItemSymbol]:
@@ -14,6 +14,24 @@ def get_symbol_after_dot(item: Item) -> Optional[ItemSymbol]:
             return item.rhp[dot_index + 1]
         else:
             return None
+    except ValueError:
+        return None
+
+
+def get_item_with_shifted_dot(item: Item) -> Optional[Item]:
+    try:
+        dot_index = item.rhp.index(Dot)
+
+        if dot_index == len(item.rhp) - 1:
+            return None
+
+        rhp = (
+            item.rhp[:dot_index]
+            + [item.rhp[dot_index + 1], Dot]
+            + item.rhp[dot_index + 2 :]
+        )
+
+        return Item(item.lhp, rhp)
     except ValueError:
         return None
 
@@ -43,3 +61,15 @@ class Parser:
                 break
 
         return State(items)
+
+    def goto(self, state: State, symbol: Symbol) -> Optional[State]:
+        for item in state.items:
+            symbol_after_dot = get_symbol_after_dot(item)
+
+            if symbol_after_dot != symbol:
+                continue
+
+            shifted_item = get_item_with_shifted_dot(item)
+            return self.closure(shifted_item)
+
+        return None

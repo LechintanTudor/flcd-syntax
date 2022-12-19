@@ -7,4 +7,11 @@ from dot import Dot
 if __name__ == "__main__":
     grammar = Grammar.load_from_json("docs/simple.json")
     parser = Parser(grammar)
-    print(parser.closure(Item("S'", [Dot, "S"])))
+
+    initial_state = parser.closure(Item("S'", [Dot, "S"]))
+    print(initial_state)
+
+    print()
+
+    next_state = parser.goto(initial_state, "b")
+    print(next_state)
