@@ -4,7 +4,7 @@ from state import State
 from item import Item
 from typing import Optional
 from parser_types import ItemSymbol, Symbol
-from canonical_collection import CanonicalCollection
+from canonical_collection import CanonicalCollection, StateIndexEdge
 
 
 def get_symbol_after_dot(item: Item) -> Optional[ItemSymbol]:
@@ -75,5 +75,49 @@ class Parser:
 
         return None
 
-    def canonical_collection(self) -> Cann:
-        raise NotImplementedError()
+    def canonical_collection(self) -> CanonicalCollection:
+        starting_item = next(
+            self._augmented_grammar.items_for(self._augmented_grammar.start_nonterminal)
+        )
+
+        initial_state = self.closure(starting_item)
+
+        states = [initial_state]
+        edges = {}
+
+        while True:
+            new_state_found = False
+
+            i = 0
+            while i < len(states):
+                state = states[i]
+
+                for symbol in self._augmented_grammar.symbols():
+                    next_state = self.goto(state, symbol)
+
+                    if next_state is None:
+                        continue
+
+                    next_state_index = None
+
+                    try:
+                        next_state_index = states.index(next_state)
+                    except ValueError:
+                        next_state_index = len(states)
+                        states.append(next_state)
+                        new_state_found = True
+
+                    if i not in edges:
+                        edges[i] = []
+
+                    state_index_edge = StateIndexEdge(symbol, next_state_index)
+
+                    if not state_index_edge in edges[i]:
+                        edges[i].append(state_index_edge)
+
+                i += 1
+                
+            if not new_state_found:
+                break
+
+        return CanonicalCollection(states, edges)

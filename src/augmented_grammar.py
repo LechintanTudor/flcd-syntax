@@ -35,3 +35,10 @@ class AugmentedGrammar:
         for item in self.items:
             if item.lhp == nonterminal:
                 yield item
+
+    def symbols(self) -> Iterator[Symbol]:
+        for terminal in self.terminals:
+            yield terminal
+
+        for nonterminal in self.nonterminals:
+            yield nonterminal
