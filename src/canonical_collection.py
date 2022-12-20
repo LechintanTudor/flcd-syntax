@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from state import State
+from typing import Optional
+from item import Item
 from parser_types import Symbol
 
 
@@ -15,7 +17,9 @@ class CanonicalCollection:
     edges: dict[int, list[StateIndexEdge]]
 
     def __str__(self) -> str:
-        state_str = "\n\n".join([f"[State {i}]\n{state}" for i, state in enumerate(self.states)])
+        state_str = "\n\n".join(
+            [f"[State {i}]\n{state}" for i, state in enumerate(self.states)]
+        )
 
         edge_str = ""
         for start_index, edges in self.edges.items():
@@ -25,3 +29,7 @@ class CanonicalCollection:
                 )
 
         return f"{state_str}\n{edge_str}"
+
+    @property
+    def starting_item(self) -> Item:
+        return self.states[0].items[0]

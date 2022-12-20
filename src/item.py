@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from parser_types import Nonterminal, ItemSymbol
 
 
-@dataclass
+@dataclass(eq=True)
 class Item:
     lhp: Nonterminal
     rhp: list[ItemSymbol]

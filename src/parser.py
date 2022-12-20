@@ -1,3 +1,4 @@
+from augmented_grammar import AugmentedGrammar
 from grammar import Grammar
 from dot import Dot
 from state import State
@@ -116,8 +117,12 @@ class Parser:
                         edges[i].append(state_index_edge)
 
                 i += 1
-                
+
             if not new_state_found:
                 break
 
         return CanonicalCollection(states, edges)
+
+    @property
+    def augmented_grammar(self) -> AugmentedGrammar:
+        return self._augmented_grammar

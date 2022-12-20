@@ -111,6 +111,7 @@
     	"program": [
     		["~", "declaration", "statement", "~"]
     	]
-    }
+    },
+    "start_nonterminal": "program"
 }
 
