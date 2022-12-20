@@ -75,11 +75,11 @@ class Lr0Table:
     ):
         starting_item = canonical_collection.starting_item
 
-        self._actions = [
+        self.actions = [
             get_action(state, starting_item) for state in canonical_collection.states
         ]
 
-        self._gotos = [
+        self.gotos = [
             get_goto_row(augmented_grammar, canonical_collection, state_index)
             for state_index in range(len(canonical_collection.states))
         ]
@@ -87,7 +87,7 @@ class Lr0Table:
     def __str__(self) -> str:
         result_str = ""
 
-        for i, (action, gotos) in enumerate(zip(self._actions, self._gotos)):
+        for i, (action, gotos) in enumerate(zip(self.actions, self.gotos)):
             result_str = f"{result_str}\n{i}: {action} | {gotos}"
 
         return result_str
