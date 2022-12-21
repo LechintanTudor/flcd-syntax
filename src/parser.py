@@ -12,6 +12,7 @@ from production import Production
 
 
 def get_symbol_after_dot(item: Item) -> Optional[ItemSymbol]:
+    """For the given item, returns the next symbol after dot, if any."""
     try:
         dot_index = item.rhp.index(Dot)
 
@@ -24,6 +25,10 @@ def get_symbol_after_dot(item: Item) -> Optional[ItemSymbol]:
 
 
 def get_item_with_shifted_dot(item: Item) -> Optional[Item]:
+    """
+    If the given item has a dot in a non-final position, returns the item with the
+    dot and the next symbol after the dot swapped.
+    """
     try:
         dot_index = item.rhp.index(Dot)
 
@@ -42,6 +47,7 @@ def get_item_with_shifted_dot(item: Item) -> Optional[Item]:
 
 
 def get_topmost_state_index(stack: list) -> Optional[int]:
+    """Returns the topmost state in the stack, if any."""
     for element in reversed(stack):
         if isinstance(element, int):
             return element
@@ -50,6 +56,10 @@ def get_topmost_state_index(stack: list) -> Optional[int]:
 
 
 def remove_production(stack: list, production: Production) -> bool:
+    """
+    Removes the given production from the stack and returns whether the removal was
+    successful.
+    """
     starting_index = len(stack) - 2 * len(production.rhp)
 
     if starting_index < 0:
@@ -66,10 +76,13 @@ def remove_production(stack: list, production: Production) -> bool:
 
 
 class Parser:
+    """Parser for a provided grammar."""
+
     def __init__(self, grammar: Grammar):
         self._augmented_grammar = grammar.augment()
 
     def closure(self, starting_item: Item) -> State:
+        """Computes a state from the provided starting item."""
         items = [starting_item]
 
         while True:
@@ -92,6 +105,10 @@ class Parser:
         return State(items)
 
     def goto(self, state: State, symbol: Symbol) -> Optional[State]:
+        """
+        Returns the state obtained from the closure of the shifted item that contains the provided
+        symbol after the dot, if any.
+        """
         for item in state.items:
             symbol_after_dot = get_symbol_after_dot(item)
 
@@ -104,6 +121,7 @@ class Parser:
         return None
 
     def canonical_collection(self) -> CanonicalCollection:
+        """Returns the canonical collection generated from the augmented grammar."""
         starting_item = next(
             self._augmented_grammar.items_for(self._augmented_grammar.start_nonterminal)
         )
@@ -152,9 +170,14 @@ class Parser:
 
     @property
     def augmented_grammar(self) -> AugmentedGrammar:
+        """
+        Returns the augmented grammar generated from the grammar provided when
+        creating the parser.
+        """
         return self._augmented_grammar
 
     def parse(self, terminals: list[Terminal]) -> list[Production]:
+        """Parses a list of terminals into a list of productions."""
         canonical_collection = self.canonical_collection()
         lr0_table = Lr0Table(self._augmented_grammar, canonical_collection)
 

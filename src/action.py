@@ -5,6 +5,8 @@ from production import Production
 
 
 class ActionType(Enum):
+    """Type of action."""
+
     SHIFT = auto()
     REDUCE = auto()
     ACCEPT = auto()
@@ -13,6 +15,8 @@ class ActionType(Enum):
 
 @dataclass
 class Action:
+    """Action that corresponds to a state in the LR0 table."""
+
     kind: ActionType
     production: Optional[Production] = None
 

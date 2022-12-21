@@ -1,4 +1,6 @@
 class DotType:
+    """Dot type used in augmented grammars."""
+
     def __init__(self):
         pass
 

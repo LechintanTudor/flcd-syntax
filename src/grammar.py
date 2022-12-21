@@ -9,12 +9,15 @@ from production import Production
 
 @dataclass
 class Grammar:
+    """Simple grammar."""
+
     nonterminals: set[Nonterminal]
     terminals: set[Terminal]
     productions: list[Production]
     start_nonterminal: Nonterminal
 
     def augment(self) -> AugmentedGrammar:
+        """Returns the augmented grammar generated from this grammar."""
         aug_start_nonterminal = f"{self.start_nonterminal}'"
         aug_nonterminals = self.nonterminals.union({aug_start_nonterminal})
 
@@ -43,6 +46,7 @@ class Grammar:
 
     @staticmethod
     def load_from_json(path: str) -> "Grammar":
+        """Loads the grammar from a json file."""
         with open(path, "rt") as file:
             json_data = json.load(file)
             nonterminals = set(json_data["nonterminals"].keys())

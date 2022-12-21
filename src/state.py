@@ -5,6 +5,8 @@ from item import Item
 
 @dataclass
 class State:
+    """State represented as a list of items."""
+
     items: list[Item]
 
     def __str__(self) -> str:
@@ -28,4 +30,5 @@ class State:
 
     @property
     def starting_item(self) -> Item:
+        """Return the first item in the state."""
         return self.items[0]

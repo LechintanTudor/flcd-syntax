@@ -8,6 +8,8 @@ from typing import Iterator
 
 @dataclass
 class AugmentedGrammar:
+    """Augmented grammar used by the parser."""
+
     nonterminals: set[Nonterminal]
     terminals: set[Terminal]
     productions: list[Production]
@@ -27,16 +29,19 @@ class AugmentedGrammar:
         )
 
     def productions_for(self, nonterminal: Nonterminal) -> Iterator[Production]:
+        """Returns an iterator over all productions that have the given nonterminal as their left part."""
         for production in self.productions:
             if production.lhp == nonterminal:
                 yield production
 
     def items_for(self, nonterminal: Nonterminal) -> Iterator[Item]:
+        """Returns an iterator over all items that have the given nonterminal as their left part."""
         for item in self.items:
             if item.lhp == nonterminal:
                 yield item
 
     def symbols(self) -> Iterator[Symbol]:
+        """Returns an iterator over all terminals and nonterminals in the grammar."""
         for terminal in self.terminals:
             yield terminal
 

@@ -10,6 +10,7 @@ from parser_types import Symbol
 
 
 def should_shift(state: State) -> bool:
+    """Checks if the given state requires a shift action."""
     for item in state.items:
         try:
             dot_index = item.rhp.index(Dot)
@@ -23,6 +24,10 @@ def should_shift(state: State) -> bool:
 
 
 def should_reduce(state: State) -> Optional[Production]:
+    """
+    Checks if the given state requires a reduce action.
+    If so, returns the production used for reduction.
+    """
     for item in state.items:
         try:
             dot_index = item.rhp.index(Dot)
@@ -36,11 +41,13 @@ def should_reduce(state: State) -> Optional[Production]:
 
 
 def should_accept(state: State, starting_item: Item) -> bool:
+    """Checks if the given state requires an accept action."""
     end_item = Item(starting_item.lhp, starting_item.rhp[1:] + [Dot])
     return end_item in state.items
 
 
 def get_action(state: State, starting_item: Item) -> Action:
+    """Returns the action required by the given state."""
     if should_accept(state, starting_item):
         return Action(ActionType.ACCEPT)
     elif should_shift(state):
@@ -56,6 +63,7 @@ def get_goto_row(
     canonical_collection: CanonicalCollection,
     state_index: int,
 ) -> dict[Symbol, Optional[int]]:
+    """Returns the goto row of the state at the given index."""
     goto_row = {symbol: None for symbol in augmented_grammar.symbols()}
 
     if state_index not in canonical_collection.edges:
@@ -68,6 +76,8 @@ def get_goto_row(
 
 
 class Lr0Table:
+    """Lr0 table computed from an augmented grammar."""
+
     def __init__(
         self,
         augmented_grammar: AugmentedGrammar,
