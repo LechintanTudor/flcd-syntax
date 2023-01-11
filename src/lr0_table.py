@@ -28,16 +28,19 @@ def should_reduce(state: State) -> Optional[Production]:
     Checks if the given state requires a reduce action.
     If so, returns the production used for reduction.
     """
+    res_production: Optional[Production] = None
     for item in state.items:
         try:
             dot_index = item.rhp.index(Dot)
 
             if dot_index == len(item.rhp) - 1:
-                return Production(item.lhp, item.rhp[:-1])
+                if res_production:
+                    raise ValueError(f"!reduce-reduce conflict in state!\n{state}")
+                res_production = Production(item.lhp, item.rhp[:-1])
         except:
             pass
 
-    return None
+    return res_production
 
 
 def should_accept(state: State, starting_item: Item) -> bool:
@@ -50,12 +53,20 @@ def get_action(state: State, starting_item: Item) -> Action:
     """Returns the action required by the given state."""
     if should_accept(state, starting_item):
         return Action(ActionType.ACCEPT)
-    elif should_shift(state):
-        return Action(ActionType.SHIFT)
-    elif (production := should_reduce(state)) is not None:
-        return Action(ActionType.REDUCE, production)
-    else:
-        return Action(ActionType.ERROR)
+
+    future_actions: list[Action] = []
+
+    if should_shift(state):
+        future_actions.append(Action(ActionType.SHIFT))
+    if (production := should_reduce(state)) is not None:
+        future_actions.append(Action(ActionType.REDUCE, production))
+
+    if len(future_actions) == 1:
+        return future_actions[0]
+    if len(future_actions) > 1:
+        raise ValueError(f"!shift-reduce conflict in state!\n{state}")
+
+    return Action(ActionType.ERROR)
 
 
 def get_goto_row(
