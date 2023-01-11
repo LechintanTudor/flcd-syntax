@@ -212,4 +212,7 @@ class Parser:
             else:
                 raise ValueError("Parser error")
 
+        if len(beta) != 1:
+            raise ValueError("Input stack not empty")
+
         return pi

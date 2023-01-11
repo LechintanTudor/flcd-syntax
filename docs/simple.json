@@ -1,12 +1,12 @@
 {
-  "terminals": ["a", "b"],
+  "terminals": ["a", "b", "c"],
   "nonterminals": {
     "S": [
-      ["A","A"]
+      ["a", "A"]
     ],
     "A": [
-      ["a", "A"],
-      ["b"]
+      ["b", "A"],
+      ["c"]
     ]
   },
   "start_nonterminal": "S"
