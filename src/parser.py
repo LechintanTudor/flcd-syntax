@@ -80,6 +80,8 @@ class Parser:
 
     def __init__(self, grammar: Grammar):
         self._augmented_grammar = grammar.augment()
+        self._canonical_collection = self.canonical_collection()
+        self._lr0_table = Lr0Table(self._augmented_grammar, self._canonical_collection)
 
     def closure(self, starting_item: Item) -> State:
         """Computes a state from the provided starting item."""
@@ -176,21 +178,23 @@ class Parser:
         """
         return self._augmented_grammar
 
+    @property
+    def lr0_table(self) -> Lr0Table:
+        """Returns the lr0 table associated with the grammar provided when creating the parser."""
+        return self._lr0_table
+
     def parse(self, terminals: list[Terminal]) -> list[Production]:
         """Parses a list of terminals into a list of productions."""
-        canonical_collection = self.canonical_collection()
-        lr0_table = Lr0Table(self._augmented_grammar, canonical_collection)
-
         alfa = ["$", 0]
         beta = terminals + ["$"]
         pi = []
 
-        while lr0_table.actions[alfa[-1]].kind != ActionType.ACCEPT:
+        while self._lr0_table.actions[alfa[-1]].kind != ActionType.ACCEPT:
             state_index = get_topmost_state_index(alfa)
-            action = lr0_table.actions[state_index]
+            action = self._lr0_table.actions[state_index]
 
             if action.kind == ActionType.SHIFT:
-                next_state_index = lr0_table.gotos[state_index][beta[0]]
+                next_state_index = self._lr0_table.gotos[state_index][beta[0]]
 
                 if next_state_index is None:
                     raise ValueError("Parser error")
@@ -200,7 +204,7 @@ class Parser:
             elif action.kind == ActionType.REDUCE:
                 if remove_production(alfa, action.production):
                     state_index = get_topmost_state_index(alfa)
-                    next_state_index = lr0_table.gotos[state_index][
+                    next_state_index = self._lr0_table.gotos[state_index][
                         action.production.lhp
                     ]
                     alfa += [action.production.lhp, next_state_index]
